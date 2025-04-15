@@ -1,0 +1,163 @@
+# 2ª PARTE: Análise Exploratória Gráfica
+# Gráficos Exploratórios do ggplot2
+
+# 1. Carregar Pacotes
+if(!require(dplyr))install.packages("dplyr")
+library(dplyr)
+if(!require(ggplot2))install.packages("ggplot2")
+library(ggplot2)
+if(!require(corrplot))install.packages("corrplot")
+library(corrplot)
+if(!require(PerformanceAnalytics))install.packages("PerformanceAnalytics")
+library(PerformanceAnalytics)
+if(!require(ggthemes))install.packages("ggthemes")
+library(ggthemes)
+if(!require(readxl))install.packages("readxl")
+library(readxl)
+if(!require(sf))install.packages("sf")
+library(sf)
+if(!require(spgwr))install.packages("spgwr")
+library(spgwr)
+if(!require(tmap))install.packages("tmap")
+library(tmap)
+if(!require(geobr))install.packages("geobr")
+library(geobr)
+if(!require(ggspatial))install.packages("ggspatial")
+library(ggspatial)
+if(!require(ggpubr))install.packages("ggpubr")
+library(ggpubr)
+##
+if(!require(plyr))install.packages("plyr")
+library(plyr) # Interfere no 'dplyr'
+##
+# Planilha de Dados:
+
+# 2. Ler os dados do Excel (valores de arrendamento por rua)
+dados_bairros <- read_excel("F:/GOOGLE DRIVE_backup/PATIO DE TRIAGENS/ANALISES GEO/GWR_GEO/RECIFE_400.xlsx",
+                            sheet = 3)
+dados_bairros
+
+# 3. Dispersão com reta ajustada Valor (R$/imóvel) vs. Área (m²)
+dados_bairros <- dados_bairros %>%
+  filter(BAIRRO %in% c("Boa Viagem", "Boa Vista", "Imbiribeira", "Recife"))
+dados_bairros
+
+# 3.1. Dispersão com reta ajustada: Valor (R$/imóvel) como função da área
+ggplot(data = dados_bairros,aes(x=AREA,y=VALOR))+
+  geom_point(shape=16,aes(color=BAIRRO))+
+  geom_smooth(method = "lm",se=F,size=0.5,color="red")+
+  labs(y="Valor (R$/imóvel)",x="Área (m²)",color="Bairros")+
+  scale_y_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  scale_x_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  facet_wrap(~BAIRRO,ncol=2,scale="free")+
+  stat_regline_equation() +
+  theme_few()
+
+# 3.2. Dispersão com reta ajustada: Valor (R$/imóvel) como função da área e vagas (size)
+ggplot(data = dados_bairros,aes(x=AREA,y=VALOR))+
+  geom_point(shape=16,aes(color=BAIRRO,size=VAGA))+
+  geom_smooth(method = "lm",se=F,size=0.5,color="red")+
+  labs(y="Valor (R$/imóvel)",x="Área (m²)",color="Bairros", size = "Vagas")+
+  scale_y_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  scale_x_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  facet_wrap(~BAIRRO,ncol=2,scale="free")+
+  stat_regline_equation() +
+  theme_few()
+# Esse gráfico mostra na realidade 3 dimensões: Área, Valor e Vaga
+
+# 3.3. Dispersão com reta ajustada: Valor (R$/imóvel) como função da área e WC (size)
+ggplot(data = dados_bairros,aes(x=AREA,y=VALOR))+
+  geom_point(shape=16,aes(color=BAIRRO,size=WC))+
+  geom_smooth(method = "lm",se=F,size=0.5,color="red")+
+  labs(y="Valor (R$/imóvel)",x="Área (m²)",color="Bairros", size = "WC")+
+  scale_y_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  scale_x_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  facet_wrap(~BAIRRO,ncol=2,scale="free")+
+  stat_regline_equation() +
+  theme_few()
+# Esse gráfico mostra na realidade 3 dimensões: Área, Valor e WC
+
+# 4. Dispersão com reta ajustada Valor (R$/m²) vs. Área (m²)
+dados_bairros <- dados_bairros %>%
+  filter(BAIRRO %in% c("Boa Viagem", "Boa Vista", "Imbiribeira", "Recife"))
+dados_bairros
+
+# 4.1. Dispersão com reta ajustada: Valor (R$/m²) como função da área
+ggplot(data = dados_bairros,aes(x=AREA,y=M2))+
+  geom_point(shape=16,aes(color=BAIRRO))+
+  geom_smooth(method = "lm",se=F,size=0.5,color="blue")+
+  labs(y="Valor (R$/m²)",x="Área (m²)",color="Bairros")+
+  scale_y_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  scale_x_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  facet_wrap(~BAIRRO,ncol=2,scale="free")+
+  stat_regline_equation() +
+  theme_few()
+
+# 4.2. Dispersão com reta ajustada: Valor (R$/m²) como função da área e vagas (size)
+ggplot(data = dados_bairros,aes(x=AREA,y=M2))+
+  geom_point(shape=16,aes(color=BAIRRO,size=VAGA))+
+  geom_smooth(method = "lm",se=F,size=0.5,color="blue")+
+  labs(y="Valor (R$/m²)",x="Área (m²)",color="Bairros", size = "Vagas")+
+  scale_y_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  scale_x_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  facet_wrap(~BAIRRO,ncol=2,scale="free")+
+  stat_regline_equation() +
+  theme_few()
+# Esse gráfico mostra na realidade 3 dimensões: Área, M2 e Vaga
+
+# 4.3. Dispersão com reta ajustada: Valor (R$/m²) como função da área e WC (size)
+ggplot(data = dados_bairros,aes(x=AREA,y=M2))+
+  geom_point(shape=16,aes(color=BAIRRO,size=WC))+
+  geom_smooth(method = "lm",se=F,size=0.5,color="blue")+
+  labs(y="Valor (R$/m²)",x="Área (m²)",color="Bairros", size = "WC")+
+  scale_y_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  scale_x_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  facet_wrap(~BAIRRO,ncol=2,scale="free")+
+  stat_regline_equation() +
+  theme_few()
+# Esse gráfico mostra na realidade 3 dimensões: Área, M2 e WC
+
+# 5. Histogramas para valores médios
+if(!require(plyr))install.packages("plyr")
+library(plyr) # Interfere no 'dplyr'
+# 5.1. Histogramas para valores médios (R$/imóvel)
+mu<-ddply(dados_bairros,"BAIRRO",summarise,grp.mean=mean(VALOR))
+mu
+
+ggplot(data = dados_bairros,aes(x=VALOR))+
+  geom_histogram(aes(y = ..density..,fill=BAIRRO),color="black",
+                 bins = 25)+
+  labs(y="Frequência Relativa",x="Valor (R$/imóvel)",fill="Bairros",color="Bairros")+
+  stat_density(geom = "line",color="red",size=0.7) +
+  scale_x_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ",",
+                                                  scale = 1e-3))+
+  scale_y_continuous(labels=scales::scientific_format(big.mark = ".",decimal.mark = ","))+
+  geom_vline(data=mu,color = "red", aes(xintercept=grp.mean),
+             linetype="dashed", size=1)+
+  facet_wrap(~BAIRRO,ncol=2,scale="free")+
+  theme_few()
+
+# 5.2. Histogramas para valores médios (R$/m²)
+mu1<-ddply(dados_bairros,"BAIRRO",summarise,grp.mean=mean(M2))
+mu1
+
+ggplot(data = dados_bairros,aes(x=M2))+
+  geom_histogram(aes(y = ..density..,fill=BAIRRO),color="black",
+                 bins = 25)+
+  labs(y="Frequência Relativa",x="Valor (R$/m²)",fill="Bairros",color="Bairros")+
+  stat_density(geom = "line",color="red",size=0.7) +
+  scale_x_continuous(labels=scales::number_format(big.mark = ".",decimal.mark = ","))+
+  scale_y_continuous(labels=scales::scientific_format(big.mark = ".",decimal.mark = ","))+
+  geom_vline(data=mu1,color = "red", aes(xintercept=grp.mean),
+             linetype="dashed", size=1)+
+  facet_wrap(~BAIRRO,ncol=2,scale="free")+
+  theme_few()
+
+if("package:plyr" %in% search()) detach("package:plyr", unload = TRUE) # desabilitar o 'plyr'.
+
+
+
+
+
+
+

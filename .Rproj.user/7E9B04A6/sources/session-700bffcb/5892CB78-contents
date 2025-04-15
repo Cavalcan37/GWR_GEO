@@ -1,0 +1,26 @@
+# 3ª PARTE: Análise das Correlações
+# Matriz Gráfica de Correlações
+
+# 1. Carregar Pacotes
+if(!require(dplyr))install.packages("dplyr")
+library(dplyr)
+if(!require(ggplot2))install.packages("ggplot2")
+library(ggplot2)
+if(!require(corrplot))install.packages("corrplot")
+library(corrplot)
+if(!require(PerformanceAnalytics))install.packages("PerformanceAnalytics")
+library(PerformanceAnalytics)
+if(!require(readxl))install.packages("readxl")
+library(readxl)
+##
+# Planilha de Dados:
+
+# 2. Dados
+dados_bairros <- read_excel("F:/GOOGLE DRIVE_backup/PATIO DE TRIAGENS/RECIFE_400.xlsx",
+                            sheet = 3)
+dados_bairros
+
+# 3. Correlação I
+
+chart.Correlation(dados_bairros[,c(2,3,5,6)],histogram=T)
+ 
